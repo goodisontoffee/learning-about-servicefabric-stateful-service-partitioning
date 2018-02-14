@@ -23,6 +23,10 @@ namespace Client
             ShowRoadsInWrongPartition("London");
             ShowRoads("York");
 
+            ShowRoads("Edinburgh", new RoadServiceProxy());
+            ShowRoads("London", new RoadServiceProxy());
+            ShowRoads("York", new RoadServiceProxy());
+
             Console.ReadKey(true);
         }
 
