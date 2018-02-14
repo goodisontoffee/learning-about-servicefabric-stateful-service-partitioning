@@ -20,6 +20,7 @@ namespace Client
 
             ShowRoads("Edinburgh");
             ShowRoads("London");
+            ShowRoadsInWrongPartition("London");
             ShowRoads("York");
 
             Console.ReadKey(true);
@@ -27,11 +28,8 @@ namespace Client
 
         private static ServiceInteraction AddRoad(string town, string roadName)
         {
-            Console.WriteLine($"Adding road: {roadName} to town: {town}.");
             var roadService = GetRoadServiceProxy();
-            var serviceInteraction = roadService.AddRoad(town, roadName).GetAwaiter().GetResult();
-            DescribeServiceInteraction(serviceInteraction);
-            return serviceInteraction;
+            return AddRoad(town, roadName, roadService);
         }
 
         private static IRoadService GetRoadServiceProxy()
@@ -39,6 +37,14 @@ namespace Client
             var serviceUri = new Uri($"fabric:/ServiceFabricApplication/RoadServiceFacade");
             var proxyFactory = new ServiceProxyFactory(_ => new FabricTransportServiceRemotingClientFactory());
             return proxyFactory.CreateServiceProxy<IRoadService>(serviceUri);
+        }
+
+        private static ServiceInteraction AddRoad(string town, string roadName, IRoadService roadService)
+        {
+            Console.WriteLine($"Adding road: {roadName} to town: {town}.");
+            var serviceInteraction = roadService.AddRoad(town, roadName).GetAwaiter().GetResult();
+            DescribeServiceInteraction(serviceInteraction);
+            return serviceInteraction;
         }
 
         private static void DescribeServiceInteraction(ServiceInteraction serviceInteraction)
@@ -49,21 +55,29 @@ namespace Client
 
         private static ServiceInteraction AddRoadToWrongParition(string town, string roadName)
         {
-            Console.WriteLine($"Adding road: {roadName} to town: {town} but with the wrong partition strategy.");
+            Console.WriteLine($"Applying incorrect partitioning strategy.");
+            var roadService = ApplyIncorrectPartitioningStrategy();
+            return AddRoad(town, roadName, roadService);
+        }
+
+        private static IRoadService ApplyIncorrectPartitioningStrategy()
+        {
             var serviceUri = new Uri($"fabric:/ServiceFabricApplication/RoadService");
             var proxyFactory = new ServiceProxyFactory(_ => new FabricTransportServiceRemotingClientFactory());
             var partitionKey = new ServicePartitionKey(1848674407370955162);
             var roadService = proxyFactory.CreateServiceProxy<IRoadService>(serviceUri, partitionKey);
-            var serviceInteraction = roadService.AddRoad(town, roadName).GetAwaiter().GetResult();
-            DescribeServiceInteraction(serviceInteraction);
-            return serviceInteraction;
-
+            return roadService;
         }
 
         private static ServiceInteraction ShowRoads(string town)
         {
-            Console.WriteLine($"Showing roads in town: {town}.");
             var roadService = GetRoadServiceProxy();
+            return ShowRoads(town, roadService);
+        }
+
+        private static ServiceInteraction ShowRoads(string town, IRoadService roadService)
+        {
+            Console.WriteLine($"Showing roads in town: {town}.");
             var serviceInteraction = roadService.GetRoads(town).GetAwaiter().GetResult();
             DescribeServiceInteraction(serviceInteraction, "road");
             return serviceInteraction;
@@ -77,6 +91,13 @@ namespace Client
             }
 
             DescribeServiceInteraction(serviceInteraction as ServiceInteraction);
+        }
+
+        private static ServiceInteraction ShowRoadsInWrongPartition(string town)
+        {
+            Console.WriteLine($"Applying incorrect partitioning strategy.");
+            var roadService = ApplyIncorrectPartitioningStrategy();
+            return ShowRoads(town, roadService);
         }
     }
 }
