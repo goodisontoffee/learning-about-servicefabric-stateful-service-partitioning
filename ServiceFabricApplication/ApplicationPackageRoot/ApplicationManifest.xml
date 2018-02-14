@@ -30,7 +30,7 @@
     </Service>
     <Service Name="RoadService" ServicePackageActivationMode="ExclusiveProcess">
       <StatefulService ServiceTypeName="RoadServiceType" TargetReplicaSetSize="[RoadService_TargetReplicaSetSize]" MinReplicaSetSize="[RoadService_MinReplicaSetSize]">
-        <UniformInt64Partition PartitionCount="[RoadService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+        <UniformInt64Partition PartitionCount="[RoadService_PartitionCount]" LowKey="0" HighKey="1000" />
       </StatefulService>
     </Service>
   </DefaultServices>
