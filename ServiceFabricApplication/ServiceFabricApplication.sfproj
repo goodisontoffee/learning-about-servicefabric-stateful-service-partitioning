@@ -34,6 +34,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RoadServiceFacade\RoadServiceFacade.csproj" />
     <ProjectReference Include="..\RoadService\RoadService.csproj" />
+    <ProjectReference Include="..\TownService\TownService.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <PropertyGroup>

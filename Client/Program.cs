@@ -13,6 +13,14 @@ namespace Client
             Console.WriteLine("Press a key once the cluster is ready.");
             Console.ReadKey(true);
 
+            AddTown("London", "London");
+            AddTown("Yorkshire", "York");
+            AddTown("Midlothian", "Edinburgh");
+
+            ShowTowns("London");
+            ShowTowns("Yorkshire");
+            ShowTowns("Midlothian");
+
             AddRoad("London", "Downing Street");
             AddRoadToWrongParition("London", "Bond Street");
             AddRoad("London", "Oxford Street");
@@ -102,6 +110,38 @@ namespace Client
             Console.WriteLine($"Applying incorrect partitioning strategy.");
             var roadService = ApplyIncorrectPartitioningStrategy(town);
             return ShowRoads(town, roadService);
+        }
+
+        private static ServiceInteraction AddTown(string county, string townName)
+        {
+            var townService = GetTownServiceProxy();
+            return AddTown(county, townName, townService);
+        }
+
+        private static ITownService GetTownServiceProxy()
+        {
+            return new TownServiceProxy();
+        }
+
+        private static ServiceInteraction AddTown(string county, string townName, ITownService townService)
+        {
+            Console.WriteLine($"Adding town: {townName} to county: {county}.");
+            var serviceInteraction = townService.AddTown(county, townName).GetAwaiter().GetResult();
+            DescribeServiceInteraction(serviceInteraction);
+            return serviceInteraction;
+        }
+
+        private static ServiceInteraction ShowTowns(string county)
+        {
+            var townService = GetTownServiceProxy();
+            return ShowTowns(county, townService);
+        }
+        private static ServiceInteraction ShowTowns(string county, ITownService townService)
+        {
+            Console.WriteLine($"Showing towns in county: {county}.");
+            var serviceInteraction = townService.GetTowns(county).GetAwaiter().GetResult();
+            DescribeServiceInteraction(serviceInteraction, "town");
+            return serviceInteraction;
         }
     }
 }
