@@ -136,6 +136,7 @@ namespace Client
             var townService = GetTownServiceProxy();
             return ShowTowns(county, townService);
         }
+
         private static ServiceInteraction ShowTowns(string county, ITownService townService)
         {
             Console.WriteLine($"Showing towns in county: {county}.");
